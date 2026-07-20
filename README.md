@@ -23,7 +23,6 @@ Add the following to `renovate.json5` (or `renovate.json`, `.github/renovate.jso
 - Waits 3 days after a release before creating a PR (supply-chain safety); vulnerability fixes are created immediately
 - Checks the OSV database in addition to GitHub's vulnerability alerts
 - Pins Docker image tags to digests
-- Refreshes lockfiles weekly (Monday morning JST) to pick up transitive updates
 - Groups non-major GitHub Actions and mise tool updates; no schedule or hourly limits, so PRs are created on every Renovate run (daily via [ghac](https://github.com/nownabe/ghac))
 - Updates versions annotated with `# renovate: datasource=... depName=...` in Dockerfiles, workflow env vars, and Makefiles (`customManagers:*Versions` presets)
 - Custom manager that updates the mise version pinned in workflow files on lines annotated with `# renovate:mise-version`

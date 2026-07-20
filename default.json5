@@ -46,14 +46,6 @@
   // Also check the OSV database, not just GitHub's vulnerability alerts
   osvVulnerabilityAlerts: true,
 
-  // Refresh lockfiles weekly to pick up transitive updates.
-  // Scheduled to match ghac's daily 05:13 JST run; the
-  // :maintainLockFilesWeekly window ("before 4am") would never match it.
-  lockFileMaintenance: {
-    enabled: true,
-    schedule: ["before 6am on monday"],
-  },
-
   // Vulnerability fix PRs should be created immediately and prioritized
   vulnerabilityAlerts: {
     enabled: true,
