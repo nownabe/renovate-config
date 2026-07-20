@@ -5,26 +5,56 @@
     "security:openssf-scorecard",
     ":dependencyDashboard",
     ":semanticCommits",
+    // Docker major updates are disabled by default
+    "docker:enableMajor",
+    // Update versions annotated with "# renovate: datasource=... depName=..."
+    "customManagers:dockerfileVersions",
+    "customManagers:githubActionsVersions",
+    "customManagers:makefileVersions",
   ],
+
+  // Auto-create PRs migrating deprecated Renovate config options
+  configMigration: true,
 
   // Interpret all schedules in JST instead of the default UTC
   timezone: "Asia/Tokyo",
 
-  // Use "deps" as semantic commit type for all Renovate PRs
+  // Use "deps" as semantic commit type for all Renovate PRs.
+  // No scope by default ("deps: ..."); packageRules below add
+  // per-manager scopes ("deps(mise): ..." etc.)
   semanticCommitType: "deps",
+  semanticCommitScope: null,
 
   // Label all Renovate PRs
   labels: ["renovate"],
 
-  // Limit concurrent PRs to avoid overwhelming CI and reviewers
+  // Limit concurrent PRs to avoid overwhelming CI and reviewers.
+  // Disable the hourly limit (default 2): Renovate runs once a day via ghac,
+  // so the hourly limit would cap new PRs at 2 per day.
   prConcurrentLimit: 5,
+  prHourlyLimit: 0,
 
   // Automerge all PRs after CI passes
   automerge: true,
   platformAutomerge: true,
 
+  // Commit via the GitHub API so commits are signed by the GitHub App
+  // (rulesets require signed commits on default branches)
+  platformCommit: "enabled",
+
   // Wait before creating PRs to avoid compromised packages
   minimumReleaseAge: "3 days",
+
+  // Also check the OSV database, not just GitHub's vulnerability alerts
+  osvVulnerabilityAlerts: true,
+
+  // Refresh lockfiles weekly to pick up transitive updates.
+  // Scheduled to match ghac's daily 05:13 JST run; the
+  // :maintainLockFilesWeekly window ("before 4am") would never match it.
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["before 6am on monday"],
+  },
 
   // Vulnerability fix PRs should be created immediately and prioritized
   vulnerabilityAlerts: {
@@ -48,10 +78,34 @@
   ],
 
   packageRules: [
+    // Pin Docker image tags to digests for immutable references
+    // (GitHub Actions pinning is enforced platform-wide by ghac's
+    // sha_pinning_required, so no preset is needed for it)
+    {
+      matchDatasources: ["docker"],
+      pinDigests: true,
+    },
+
     // Semantic commit scope per manager
     {
       matchManagers: ["github-actions"],
       semanticCommitScope: "github-actions",
+    },
+    {
+      matchManagers: ["npm"],
+      semanticCommitScope: "npm",
+    },
+    {
+      matchManagers: ["gomod"],
+      semanticCommitScope: "go",
+    },
+    {
+      matchManagers: ["dockerfile", "docker-compose"],
+      semanticCommitScope: "docker",
+    },
+    {
+      matchManagers: ["terraform"],
+      semanticCommitScope: "terraform",
     },
     {
       matchManagers: ["mise"],
