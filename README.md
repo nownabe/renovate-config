@@ -20,7 +20,7 @@ Add the following to `renovate.json5` (or `renovate.json`, `.github/renovate.jso
 - Labels all PRs with `renovate` (`deps/major` for majors, `deps/security` for vulnerability fixes)
 - Automerges non-major updates after CI passes; major updates require manual review
 - Waits 3 days after a release before creating a PR (supply-chain safety); vulnerability fixes are created immediately
-- Groups non-major GitHub Actions and mise tool updates, scheduled weekly (before 6am on Monday, JST)
+- Groups non-major GitHub Actions and mise tool updates; no schedule restrictions, so PRs are created on every Renovate run (daily via [ghac](https://github.com/nownabe/ghac))
 - Custom manager that updates the mise version pinned in workflow files on lines annotated with `# renovate:mise-version`
 - Runs `mise lock` after `mise.toml` updates (requires self-hosted Renovate with `postUpgradeTasks` allowed; see [renovatebot/renovate#40568](https://github.com/renovatebot/renovate/issues/40568))
 

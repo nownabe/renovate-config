@@ -61,7 +61,6 @@
       matchManagers: ["custom.regex"],
       matchDepNames: ["jdx/mise"],
       semanticCommitScope: "mise",
-      schedule: ["before 6am on monday"],
     },
 
     // GitHub Actions: group non-major, individual for major
@@ -69,14 +68,12 @@
       matchManagers: ["github-actions"],
       matchUpdateTypes: ["minor", "patch", "digest"],
       groupName: "github actions (non-major)",
-      schedule: ["before 6am on monday"],
     },
     {
       matchManagers: ["github-actions"],
       matchUpdateTypes: ["major"],
       addLabels: ["deps/major"],
       automerge: false,
-      schedule: ["before 6am on monday"],
     },
 
     // mise tool versions
@@ -86,7 +83,6 @@
       matchManagers: ["mise"],
       matchUpdateTypes: ["minor", "patch"],
       groupName: "mise tools (non-major)",
-      schedule: ["before 6am on monday"],
       postUpgradeTasks: {
         commands: ["mise lock"],
         fileFilters: ["mise.lock"],
@@ -97,7 +93,6 @@
       matchUpdateTypes: ["major"],
       addLabels: ["deps/major"],
       automerge: false,
-      schedule: ["before 6am on monday"],
       postUpgradeTasks: {
         commands: ["mise lock"],
         fileFilters: ["mise.lock"],
