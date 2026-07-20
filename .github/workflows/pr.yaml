@@ -1,0 +1,64 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  common-checks:
+    name: Common Checks
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: nownabe/workflows/.github/workflows/pr.yaml@95b6433077e235025af5d3d012aebf75e00354a4 # v1.0.2
+
+  filter:
+    name: Filter
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      changes: ${{ toJSON(steps.filter.outputs) }}
+    steps:
+      - id: filter
+        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+        with:
+          filters: |
+            renovate_config:
+              - '*.json5'
+
+  check-renovate-config:
+    name: Check Renovate Config
+    needs: filter
+    if: ${{ fromJSON(needs.filter.outputs.changes).renovate_config == 'true' }}
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Validate Renovate config
+        run: npx --yes --package renovate@43.272.0 -- renovate-config-validator --strict *.json5
+
+  result:
+    name: Pull Request Checks
+    if: always()
+    needs:
+      - common-checks
+      - check-renovate-config
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Check job results
+        env:
+          HAS_FAILURE: ${{ contains(needs.*.result, 'failure') }}
+          HAS_CANCELLED: ${{ contains(needs.*.result, 'cancelled') }}
+        run: '[[ "$HAS_FAILURE" == "false" && "$HAS_CANCELLED" == "false" ]]'
