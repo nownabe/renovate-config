@@ -1,6 +1,6 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: [
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
     "config:recommended",
     "security:openssf-scorecard",
     ":dependencyDashboard",
@@ -8,116 +8,116 @@
     // Update versions annotated with "# renovate: datasource=... depName=..."
     "customManagers:dockerfileVersions",
     "customManagers:githubActionsVersions",
-    "customManagers:makefileVersions",
+    "customManagers:makefileVersions"
   ],
 
   // Auto-create PRs migrating deprecated Renovate config options
-  configMigration: true,
+  "configMigration": true,
 
   // Interpret all schedules in JST instead of the default UTC
-  timezone: "Asia/Tokyo",
+  "timezone": "Asia/Tokyo",
 
   // Use "deps" as semantic commit type for all Renovate PRs.
   // No scope by default ("deps: ..."); packageRules below add
   // per-manager scopes ("deps(mise): ..." etc.)
-  semanticCommitType: "deps",
-  semanticCommitScope: null,
+  "semanticCommitType": "deps",
+  "semanticCommitScope": null,
 
   // Label all Renovate PRs
-  labels: ["renovate"],
+  "labels": ["renovate"],
 
   // Limit concurrent PRs to avoid overwhelming CI and reviewers.
   // Disable the hourly limit (default 2): Renovate runs once a day via ghac,
   // so the hourly limit would cap new PRs at 2 per day.
-  prConcurrentLimit: 5,
-  prHourlyLimit: 0,
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 0,
 
   // Automerge all PRs after CI passes
-  automerge: true,
-  platformAutomerge: true,
+  "automerge": true,
+  "platformAutomerge": true,
 
   // Commit via the GitHub API so commits are signed by the GitHub App
   // (rulesets require signed commits on default branches)
-  platformCommit: "enabled",
+  "platformCommit": "enabled",
 
   // Wait before creating PRs to avoid compromised packages
-  minimumReleaseAge: "3 days",
+  "minimumReleaseAge": "3 days",
 
   // Also check the OSV database, not just GitHub's vulnerability alerts
-  osvVulnerabilityAlerts: true,
+  "osvVulnerabilityAlerts": true,
 
   // Vulnerability fix PRs should be created immediately and prioritized
-  vulnerabilityAlerts: {
-    enabled: true,
-    addLabels: ["deps/security"],
-    schedule: ["at any time"],
-    assignees: ["nownabe"],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "addLabels": ["deps/security"],
+    "schedule": ["at any time"],
+    "assignees": ["nownabe"]
   },
 
   // Update the mise version pinned in workflow files
   // (lines annotated with "# renovate:mise-version")
-  customManagers: [
+  "customManagers": [
     {
-      customType: "regex",
-      managerFilePatterns: ["/^\\.github/workflows/.+\\.ya?ml$/"],
-      matchStrings: ["version: (?<currentValue>\\S+) # renovate:mise-version"],
-      datasourceTemplate: "github-releases",
-      depNameTemplate: "jdx/mise",
-      extractVersionTemplate: "^v(?<version>.+)$",
-    },
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/.+\\.ya?ml$/"],
+      "matchStrings": ["version: (?<currentValue>\\S+) # renovate:mise-version"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "jdx/mise",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    }
   ],
 
-  packageRules: [
+  "packageRules": [
     // Pin Docker image tags to digests for immutable references
     // (GitHub Actions pinning is enforced platform-wide by ghac's
     // sha_pinning_required, so no preset is needed for it)
     {
-      matchDatasources: ["docker"],
-      pinDigests: true,
+      "matchDatasources": ["docker"],
+      "pinDigests": true
     },
 
     // Semantic commit scope per manager
     {
-      matchManagers: ["github-actions"],
-      semanticCommitScope: "github-actions",
+      "matchManagers": ["github-actions"],
+      "semanticCommitScope": "github-actions"
     },
     {
-      matchManagers: ["npm"],
-      semanticCommitScope: "npm",
+      "matchManagers": ["npm"],
+      "semanticCommitScope": "npm"
     },
     {
-      matchManagers: ["gomod"],
-      semanticCommitScope: "go",
+      "matchManagers": ["gomod"],
+      "semanticCommitScope": "go"
     },
     {
-      matchManagers: ["dockerfile", "docker-compose"],
-      semanticCommitScope: "docker",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "semanticCommitScope": "docker"
     },
     {
-      matchManagers: ["terraform"],
-      semanticCommitScope: "terraform",
+      "matchManagers": ["terraform"],
+      "semanticCommitScope": "terraform"
     },
     {
-      matchManagers: ["mise"],
-      semanticCommitScope: "mise",
+      "matchManagers": ["mise"],
+      "semanticCommitScope": "mise"
     },
     {
-      matchManagers: ["custom.regex"],
-      matchDepNames: ["jdx/mise"],
-      semanticCommitScope: "mise",
+      "matchManagers": ["custom.regex"],
+      "matchDepNames": ["jdx/mise"],
+      "semanticCommitScope": "mise"
     },
 
     // GitHub Actions: group non-major, individual for major
     {
-      matchManagers: ["github-actions"],
-      matchUpdateTypes: ["minor", "patch", "digest"],
-      groupName: "github actions (non-major)",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "github actions (non-major)"
     },
     {
-      matchManagers: ["github-actions"],
-      matchUpdateTypes: ["major"],
-      addLabels: ["deps/major"],
-      automerge: false,
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["deps/major"],
+      "automerge": false
     },
 
     // mise tool versions
@@ -142,24 +142,24 @@
     // allowedCommands; already configured in ghac's renovate-config.js. That
     // option can't be set from a repo-level preset, so nothing to do here.)
     {
-      matchManagers: ["mise"],
-      matchUpdateTypes: ["minor", "patch"],
-      groupName: "mise tools (non-major)",
-      postUpgradeTasks: {
-        commands: ["mise trust", "mise lock"],
-        fileFilters: ["mise.lock"],
-        executionMode: "branch",
-      },
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "mise tools (non-major)",
+      "postUpgradeTasks": {
+        "commands": ["mise trust", "mise lock"],
+        "fileFilters": ["mise.lock"],
+        "executionMode": "branch"
+      }
     },
     {
-      matchManagers: ["mise"],
-      matchUpdateTypes: ["major"],
-      addLabels: ["deps/major"],
-      automerge: false,
-      postUpgradeTasks: {
-        commands: ["mise trust", "mise lock"],
-        fileFilters: ["mise.lock"],
-      },
-    },
-  ],
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["deps/major"],
+      "automerge": false,
+      "postUpgradeTasks": {
+        "commands": ["mise trust", "mise lock"],
+        "fileFilters": ["mise.lock"]
+      }
+    }
+  ]
 }
