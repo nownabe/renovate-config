@@ -15,9 +15,9 @@ Add the following to `renovate.json5` (or `renovate.json`, `.github/renovate.jso
 
 ## What the default preset does
 
-- Extends `config:recommended`, pins GitHub Actions to digests, and enables the OpenSSF Scorecard badge and the Dependency Dashboard
+- Extends `config:recommended` and enables the OpenSSF Scorecard badge and the Dependency Dashboard
 - Semantic commits with type `deps` (scoped per manager, e.g. `deps(github-actions):`, `deps(mise):`)
-- Labels all PRs with `deps` (`deps/major` for majors, `deps/security` for vulnerability fixes)
+- Labels all PRs with `renovate` (`deps/major` for majors, `deps/security` for vulnerability fixes)
 - Automerges non-major updates after CI passes; major updates require manual review
 - Waits 3 days after a release before creating a PR (supply-chain safety); vulnerability fixes are created immediately
 - Groups non-major GitHub Actions and mise tool updates, scheduled weekly (before 6am on Monday, JST)

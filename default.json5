@@ -2,7 +2,6 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
     "config:recommended",
-    "helpers:pinGitHubActionDigests",
     "security:openssf-scorecard",
     ":dependencyDashboard",
     ":semanticCommits",
@@ -15,7 +14,7 @@
   semanticCommitType: "deps",
 
   // Label all Renovate PRs
-  labels: ["deps"],
+  labels: ["renovate"],
 
   // Limit concurrent PRs to avoid overwhelming CI and reviewers
   prConcurrentLimit: 5,
