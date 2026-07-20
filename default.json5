@@ -123,13 +123,32 @@
     // mise tool versions
     // Workaround: run `mise lock` after mise.toml updates until Renovate
     // natively supports mise lockfile maintenance (renovatebot/renovate#40568).
+    //
+    // `mise trust` runs before `mise lock`: this preset targets a self-hosted
+    // Renovate (nownabe/ghac) that clones each repo into a fresh temp directory
+    // before running postUpgradeTasks. A freshly cloned directory is untrusted
+    // (not in mise's trust store), so `mise lock` couldn't read mise.toml
+    // without trusting it first. This applies to every repo that uses mise.
+    //
+    // executionMode: "branch" (non-major only) runs the task once per branch
+    // after all updates are applied, instead of the default "update" (once per
+    // tool). Non-major updates group multiple tools into a single branch/PR,
+    // and `mise lock` regenerates the whole lockfile from mise.toml's final
+    // state, so running it per-tool would be wasteful and operate on
+    // intermediate state. Major updates get individual PRs (one tool per
+    // branch), so per-tool already means per-branch and "branch" isn't needed.
+    //
+    // (`mise trust`/`mise lock` must be allowlisted in the self-hosted admin's
+    // allowedCommands; already configured in ghac's renovate-config.js. That
+    // option can't be set from a repo-level preset, so nothing to do here.)
     {
       matchManagers: ["mise"],
       matchUpdateTypes: ["minor", "patch"],
       groupName: "mise tools (non-major)",
       postUpgradeTasks: {
-        commands: ["mise lock"],
+        commands: ["mise trust", "mise lock"],
         fileFilters: ["mise.lock"],
+        executionMode: "branch",
       },
     },
     {
@@ -138,7 +157,7 @@
       addLabels: ["deps/major"],
       automerge: false,
       postUpgradeTasks: {
-        commands: ["mise lock"],
+        commands: ["mise trust", "mise lock"],
         fileFilters: ["mise.lock"],
       },
     },
