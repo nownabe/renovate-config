@@ -5,8 +5,6 @@
     "security:openssf-scorecard",
     ":dependencyDashboard",
     ":semanticCommits",
-    // Docker major updates are disabled by default
-    "docker:enableMajor",
     // Update versions annotated with "# renovate: datasource=... depName=..."
     "customManagers:dockerfileVersions",
     "customManagers:githubActionsVersions",
