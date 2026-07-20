@@ -1,0 +1,108 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    "security:openssf-scorecard",
+    ":dependencyDashboard",
+    ":semanticCommits",
+  ],
+
+  // Interpret all schedules in JST instead of the default UTC
+  timezone: "Asia/Tokyo",
+
+  // Use "deps" as semantic commit type for all Renovate PRs
+  semanticCommitType: "deps",
+
+  // Label all Renovate PRs
+  labels: ["deps"],
+
+  // Limit concurrent PRs to avoid overwhelming CI and reviewers
+  prConcurrentLimit: 5,
+
+  // Automerge all PRs after CI passes
+  automerge: true,
+  platformAutomerge: true,
+
+  // Wait before creating PRs to avoid compromised packages
+  minimumReleaseAge: "3 days",
+
+  // Vulnerability fix PRs should be created immediately and prioritized
+  vulnerabilityAlerts: {
+    enabled: true,
+    addLabels: ["deps/security"],
+    schedule: ["at any time"],
+    assignees: ["nownabe"],
+  },
+
+  // Update the mise version pinned in workflow files
+  // (lines annotated with "# renovate:mise-version")
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^\\.github/workflows/.+\\.ya?ml$/"],
+      matchStrings: ["version: (?<currentValue>\\S+) # renovate:mise-version"],
+      datasourceTemplate: "github-releases",
+      depNameTemplate: "jdx/mise",
+      extractVersionTemplate: "^v(?<version>.+)$",
+    },
+  ],
+
+  packageRules: [
+    // Semantic commit scope per manager
+    {
+      matchManagers: ["github-actions"],
+      semanticCommitScope: "github-actions",
+    },
+    {
+      matchManagers: ["mise"],
+      semanticCommitScope: "mise",
+    },
+    {
+      matchManagers: ["custom.regex"],
+      matchDepNames: ["jdx/mise"],
+      semanticCommitScope: "mise",
+      schedule: ["before 6am on monday"],
+    },
+
+    // GitHub Actions: group non-major, individual for major
+    {
+      matchManagers: ["github-actions"],
+      matchUpdateTypes: ["minor", "patch", "digest"],
+      groupName: "github actions (non-major)",
+      schedule: ["before 6am on monday"],
+    },
+    {
+      matchManagers: ["github-actions"],
+      matchUpdateTypes: ["major"],
+      addLabels: ["deps/major"],
+      automerge: false,
+      schedule: ["before 6am on monday"],
+    },
+
+    // mise tool versions
+    // Workaround: run `mise lock` after mise.toml updates until Renovate
+    // natively supports mise lockfile maintenance (renovatebot/renovate#40568).
+    {
+      matchManagers: ["mise"],
+      matchUpdateTypes: ["minor", "patch"],
+      groupName: "mise tools (non-major)",
+      schedule: ["before 6am on monday"],
+      postUpgradeTasks: {
+        commands: ["mise lock"],
+        fileFilters: ["mise.lock"],
+      },
+    },
+    {
+      matchManagers: ["mise"],
+      matchUpdateTypes: ["major"],
+      addLabels: ["deps/major"],
+      automerge: false,
+      schedule: ["before 6am on monday"],
+      postUpgradeTasks: {
+        commands: ["mise lock"],
+        fileFilters: ["mise.lock"],
+      },
+    },
+  ],
+}
