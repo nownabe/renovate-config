@@ -28,6 +28,7 @@ jobs:
         with:
           filters: |
             renovate_config:
+              - '*.json'
               - '*.json5'
 
   check-renovate-config:
@@ -45,7 +46,7 @@ jobs:
           persist-credentials: false
 
       - name: Validate Renovate config
-        run: npx --yes --package renovate@43.272.0 -- renovate-config-validator --strict *.json5
+        run: npx --yes --package renovate@43.272.0 -- renovate-config-validator --strict *.json *.json5
 
   result:
     name: Pull Request Checks
