@@ -15,18 +15,20 @@ Add the following to `renovate.json5` (or `renovate.json`, `.github/renovate.jso
 
 ## What the default preset does
 
-- Extends `config:recommended` and enables the OpenSSF Scorecard badge and the Dependency Dashboard
-- Semantic commits with type `deps` (scoped per manager, e.g. `deps(github-actions):`, `deps(npm):`, `deps(mise):`)
-- Labels all PRs with `renovate` (`deps/major` for majors, `deps/security` for vulnerability fixes)
-- Automerges non-major updates after CI passes; major updates require manual review
+- Based on `config:recommended`; enables the OpenSSF Scorecard badge and the Dependency Dashboard
+- Semantic commits: runtime dependencies use type `deps`, everything else (CI actions, container images, infra, tool-version managers, dev/optional/peer dependencies, lockfile-only updates) is demoted to `chore`. Scoped per manager, e.g. `deps(npm):`, `deps(go):`, `chore(github-actions):`, `chore(docker):`, `chore(terraform):`, `chore(mise):`
+- Labels all PRs with `renovate`; `deps/security` for vulnerability fixes and `deps/major` for major GitHub Actions and mise updates
+- Automerges updates after CI passes; major GitHub Actions and mise updates disable automerge and require manual review
 - Commits via the GitHub API (`platformCommit`) so commits are signed by the GitHub App, satisfying `required_signatures` rulesets
-- Waits 3 days after a release before creating a PR (supply-chain safety); vulnerability fixes are created immediately
+- Waits 3 days after a release before creating a PR (supply-chain safety); vulnerability fixes are created immediately and assigned to `nownabe`
 - Checks the OSV database in addition to GitHub's vulnerability alerts
 - Pins Docker image tags to digests
-- Groups non-major GitHub Actions and mise tool updates; no schedule or hourly limits, so PRs are created on every Renovate run (daily via [ghac](https://github.com/nownabe/ghac))
+- Groups non-major GitHub Actions and mise tool updates
+- Interprets all schedules in JST (`Asia/Tokyo`)
+- Caps concurrent PRs at 5 and disables the hourly limit, so PRs are created on every Renovate run
 - Updates versions annotated with `# renovate: datasource=... depName=...` in Dockerfiles, workflow env vars, and Makefiles (`customManagers:*Versions` presets)
 - Custom manager that updates the mise version pinned in workflow files on lines annotated with `# renovate:mise-version`
-- Runs `mise lock` after `mise.toml` updates (requires self-hosted Renovate with `mise lock` in `allowedCommands`; see [renovatebot/renovate#40568](https://github.com/renovatebot/renovate/issues/40568))
+- Runs `mise trust && mise lock` after `mise.toml` updates (requires self-hosted Renovate with those commands in `allowedCommands`; see [renovatebot/renovate#40568](https://github.com/renovatebot/renovate/issues/40568))
 - Auto-migrates deprecated Renovate config options via `configMigration`
 
 Rules for managers a repository doesn't use (e.g. mise) are no-ops, so the single default preset is safe to use everywhere.
@@ -34,5 +36,5 @@ Rules for managers a repository doesn't use (e.g. mise) are no-ops, so the singl
 ## Validation
 
 ```sh
-npx --yes --package renovate renovate-config-validator default.json5 renovate.json5
+npx --yes --package renovate -- renovate-config-validator --strict default.json renovate.json5
 ```
