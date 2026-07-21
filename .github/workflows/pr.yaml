@@ -53,6 +53,7 @@ jobs:
     if: always()
     needs:
       - common-checks
+      - filter
       - check-renovate-config
     runs-on: ubuntu-slim
     timeout-minutes: 5
