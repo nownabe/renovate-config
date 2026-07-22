@@ -43,9 +43,9 @@
   // Label all Renovate PRs
   "labels": ["renovate"],
 
-  // Limit concurrent PRs to avoid overwhelming CI and reviewers.
-  // Disable the hourly limit (default 2): Renovate runs once a day via ghac,
-  // so the hourly limit would cap new PRs at 2 per day.
+  // Limit concurrent open PRs to avoid overwhelming CI and reviewers.
+  // Disable the hourly rate limit (default 2) so a run can open all pending
+  // PRs at once; prConcurrentLimit already bounds the total in flight.
   "prConcurrentLimit": 5,
   "prHourlyLimit": 0,
 
@@ -86,8 +86,8 @@
 
   "packageRules": [
     // Pin Docker image tags to digests for immutable references
-    // (GitHub Actions pinning is enforced platform-wide by ghac's
-    // sha_pinning_required, so no preset is needed for it)
+    // (GitHub Actions pinning is handled at the GitHub layer, so no preset
+    // is needed for it)
     {
       "matchDatasources": ["docker"],
       "pinDigests": true
@@ -164,7 +164,7 @@
     // natively supports mise lockfile maintenance (renovatebot/renovate#40568).
     //
     // `mise trust` runs before `mise lock`: this preset targets a self-hosted
-    // Renovate (nownabe/ghac) that clones each repo into a fresh temp directory
+    // Renovate that clones each repo into a fresh temp directory
     // before running postUpgradeTasks. A freshly cloned directory is untrusted
     // (not in mise's trust store), so `mise lock` couldn't read mise.toml
     // without trusting it first. This applies to every repo that uses mise.
@@ -178,8 +178,8 @@
     // branch), so per-tool already means per-branch and "branch" isn't needed.
     //
     // (`mise trust`/`mise lock` must be allowlisted in the self-hosted admin's
-    // allowedCommands; already configured in ghac's renovate-config.js. That
-    // option can't be set from a repo-level preset, so nothing to do here.)
+    // allowedCommands. That option can't be set from a repo-level preset, so
+    // nothing to do here.)
     {
       "matchManagers": ["mise"],
       "matchUpdateTypes": ["minor", "patch"],
