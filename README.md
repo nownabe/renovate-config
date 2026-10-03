@@ -28,7 +28,6 @@ Add the following to `renovate.json5` (or `renovate.json`, `.github/renovate.jso
 - Caps concurrent PRs at 5 and disables the hourly limit, so PRs are created on every Renovate run
 - Updates versions annotated with `# renovate: datasource=... depName=...` in Dockerfiles, workflow env vars, and Makefiles (`customManagers:*Versions` presets)
 - Custom manager that updates the mise version pinned in workflow files on lines annotated with `# renovate:mise-version`
-- Runs `mise trust && mise lock` after `mise.toml` updates (requires self-hosted Renovate with those commands in `allowedCommands`; see [renovatebot/renovate#40568](https://github.com/renovatebot/renovate/issues/40568))
 - Auto-migrates deprecated Renovate config options via `configMigration`
 
 Rules for managers a repository doesn't use (e.g. mise) are no-ops, so the single default preset is safe to use everywhere.
